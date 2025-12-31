@@ -220,7 +220,7 @@ static void link_html(GString *html, char *url, char *text) {
  */
 static void slack_attachment_to_html(GString *html, SlackAccount *sa, json_value *attachment) {
 	char *from_url = json_get_prop_strptr(attachment, "from_url");
-	if (from_url && !purple_account_get_bool(sa->account, "expand_urls", TRUE))
+	if (from_url && !purple_account_get_bool(sa->account, "expand_urls", FALSE))
 		return;
 
 	char *service_name = json_get_prop_strptr(attachment, "service_name");
@@ -354,6 +354,10 @@ static void slack_file_to_html(GString *html, SlackAccount *sa, json_value *file
 		purple_account_get_string(sa->account, "attachment_prefix", "▎ "),
 		url ?: "",
 		title ?: "file");
+
+   // for bitlbee w/e.g. ERC image-mode so image can be shown inline
+   if (purple_account_get_bool(sa->account, "display_attachment_url",TRUE))
+	  g_string_append_printf(html, "( %s )", url ?: "");
 }
 
 void slack_json_to_html(GString *html, SlackAccount *sa, json_value *message, PurpleMessageFlags *flags) {
